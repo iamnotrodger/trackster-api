@@ -1,6 +1,8 @@
 package model
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+)
 
 // Location struct
 type Location struct {
@@ -21,10 +23,10 @@ func (l *Location) Insert(db *sqlx.DB) error {
 
 // SelectLocationByAddress location by address
 func SelectLocationByAddress(db *sqlx.DB, address string) (Location, error) {
-	sqlStatement := "SELECT * FROM locations WHERE addr = $1"
+	sqlStatement := "SELECT * FROM locations WHERE addr = $1;"
 
 	var location Location
-	err := db.Get(&location, sqlStatement)
+	err := db.Get(&location, sqlStatement, address)
 
 	return location, err
 }

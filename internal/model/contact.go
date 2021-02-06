@@ -16,11 +16,11 @@ type Contact struct {
 
 // Insert Concact
 func (c *Contact) Insert(db *sqlx.DB) error {
-	sqlStatement := "INSERT INTO contact (user_id, location_id, timestamp) VALUES ($1, $2, $3) RETURNING contact_id;"
+	sqlStatement := "INSERT INTO contact (user_id, location_id, contact_time) VALUES ($1, $2, $3) RETURNING contact_id;"
 
 	var contactID string
 
-	err := db.QueryRow(sqlStatement, c.UserID, c.UserID, c.LocationID).Scan(&contactID)
+	err := db.QueryRow(sqlStatement, c.UserID, c.LocationID, c.ContactTime).Scan(&contactID)
 	if err != nil {
 		return err
 	}

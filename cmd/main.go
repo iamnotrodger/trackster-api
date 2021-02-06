@@ -37,10 +37,10 @@ func getPort() string {
 func main() {
 	port := getPort()
 
-	// db, err := initDB()
-	// if err != nil {
-	// 	panic(err)
-	// }
+	db, err := initDB()
+	if err != nil {
+		panic(err)
+	}
 
 	router := mux.NewRouter().StrictSlash(true)
 
@@ -48,7 +48,7 @@ func main() {
 	router.HandleFunc("/", handler.HomePage).Methods("GET")
 
 	//Contact
-	// router.Handle("/contact", handler.PostContact(db)).Methods("POST")
+	router.Handle("/contact", handler.PostContact(db)).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(port, router))
 }
