@@ -7,7 +7,12 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/iamnotrodger/trackster-api/internal/handler"
+	"github.com/jmoiron/sqlx"
 )
+
+func initDB() (*sqlx.DB, error) {
+	return nil, nil
+}
 
 func getPort() string {
 	var port string
@@ -23,10 +28,19 @@ func getPort() string {
 
 func main() {
 	port := getPort()
+
+	db, err := initDB()
+	if err != nil {
+		panic(err)
+	}
+
 	router := mux.NewRouter().StrictSlash(true)
 
 	//Routes
 	router.HandleFunc("/", handler.HomePage).Methods("GET")
+
+	//Contact
+	router.Handle("/contact", handler.PostContact(db)).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(port, router))
 }
