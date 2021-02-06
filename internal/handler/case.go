@@ -12,8 +12,8 @@ type CasePost struct {
 }
 
 func PostCase(db *sqlx.DB) http.Handler {
-	return http.HandlerFunc(func (rw http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		// TODO: get user id from header
-		
+
 	})
 }
