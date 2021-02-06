@@ -1,1 +1,0 @@
-FROM postgress:alphine

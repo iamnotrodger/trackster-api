@@ -1,0 +1,12 @@
+BEGIN TRANSACTION;
+CREATE TABLE users
+(
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(30) UNIQUE,
+    email VARCHAR(254),
+    picture TEXT,
+    given_name VARCHAR(50),
+    family_name VARCHAR(50),
+    joined TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+COMMIT;
