@@ -1,16 +1,20 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/iamnotrodger/trackster-api/internal/handler"
+	"github.com/jmoiron/sqlx"
 )
 
-func handleRequest() {
+func initDB() (*sqlx.DB, error) {
+	return nil, nil
+}
+
+func getPort() string {
 	var port string
 
 	if portEnv, ok := os.LookupEnv("TRACKSTER_API_PORT"); ok {
@@ -19,15 +23,24 @@ func handleRequest() {
 		port = ":8080"
 	}
 
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/", handler.HomePage).Methods("GET")
-
-	fmt.Println(port)
-	fmt.Println(os.Getenv("ACCESS_TOKEN_SECRET"))
-
-	log.Fatal(http.ListenAndServe(port, router))
+	return port
 }
 
 func main() {
-	handleRequest()
+	port := getPort()
+
+	db, err := initDB()
+	if err != nil {
+		panic(err)
+	}
+
+	router := mux.NewRouter().StrictSlash(true)
+
+	//Routes
+	router.HandleFunc("/", handler.HomePage).Methods("GET")
+
+	//Contact
+	router.Handle("/contact", handler.PostContact(db)).Methods("POST")
+
+	log.Fatal(http.ListenAndServe(port, router))
 }
