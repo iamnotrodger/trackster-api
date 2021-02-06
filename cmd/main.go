@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,7 +9,7 @@ import (
 	"github.com/iamnotrodger/trackster-api/internal/handler"
 )
 
-func handleRequest() {
+func getPort() string {
 	var port string
 
 	if portEnv, ok := os.LookupEnv("TRACKSTER_API_PORT"); ok {
@@ -19,15 +18,15 @@ func handleRequest() {
 		port = ":8080"
 	}
 
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/", handler.HomePage).Methods("GET")
-
-	fmt.Println(port)
-	fmt.Println(os.Getenv("ACCESS_TOKEN_SECRET"))
-
-	log.Fatal(http.ListenAndServe(port, router))
+	return port
 }
 
 func main() {
-	handleRequest()
+	port := getPort()
+	router := mux.NewRouter().StrictSlash(true)
+
+	//Routes
+	router.HandleFunc("/", handler.HomePage).Methods("GET")
+
+	log.Fatal(http.ListenAndServe(port, router))
 }
