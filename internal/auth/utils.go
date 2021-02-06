@@ -7,11 +7,11 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-var signingKey = []byte(os.Getenv("ACCESS_TOKEN_SECRET"))
-
-// GenerateToken function
+//GenerateToken generate a jwt token containing user ID
 func GenerateToken(userID string) (string, error) {
-	token := jwt.New(jwt.SigningMethodES256)
+	var signingKey = []byte(os.Getenv("ACCESS_TOKEN_SECRET"))
+
+	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
 	claims["user_id"] = userID
@@ -21,14 +21,11 @@ func GenerateToken(userID string) (string, error) {
 	return tokenString, err
 }
 
-// VerifyToken function
-func VerifyToken(tokenString string) (jwt.Claims, error) {
+func verifyToken(tokenString string) (jwt.Claims, error) {
+	var signingKey = []byte(os.Getenv("ACCESS_TOKEN_SECRET"))
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return signingKey, nil
 	})
 
-	if err != nil {
-		return nil, err
-	}
 	return token.Claims, err
 }
