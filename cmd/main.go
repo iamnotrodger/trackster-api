@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -8,10 +9,17 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/iamnotrodger/trackster-api/internal/handler"
 	"github.com/jmoiron/sqlx"
+
+	_ "github.com/lib/pq"
 )
 
 func initDB() (*sqlx.DB, error) {
-	return nil, nil
+	databaseURL, ok := os.LookupEnv("DATABASE_URL")
+	if !ok {
+		return nil, errors.New("DATABASE_URL missing")
+	}
+	db, err := sqlx.Connect("postgres", databaseURL)
+	return db, err
 }
 
 func getPort() string {
@@ -29,10 +37,10 @@ func getPort() string {
 func main() {
 	port := getPort()
 
-	db, err := initDB()
-	if err != nil {
-		panic(err)
-	}
+	// db, err := initDB()
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	router := mux.NewRouter().StrictSlash(true)
 
@@ -40,7 +48,7 @@ func main() {
 	router.HandleFunc("/", handler.HomePage).Methods("GET")
 
 	//Contact
-	router.Handle("/contact", handler.PostContact(db)).Methods("POST")
+	// router.Handle("/contact", handler.PostContact(db)).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(port, router))
 }
