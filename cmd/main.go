@@ -42,19 +42,22 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer db.Close()
 
 	router := mux.NewRouter().StrictSlash(true)
 
-	//Routes
-	router.HandleFunc("/", handler.HomePage).Methods("GET")
+	//Middleware
+	router.Use(handler.LoggingMiddleware)
 
-	//Contact
+	//Routes
+	router.HandleFunc("/", handler.Home).Methods("GET")
+
 	router.Handle("/api/contact", auth.Middleware(handler.PostContact(db))).Methods("POST")
 
-	//Login + Authentication
 	router.HandleFunc("/api/login", handler.Login).Methods("GET")
 	router.HandleFunc("/api/auth/google", handler.GoogleLogin).Methods("GET")
 	router.Handle("/api/auth/google/callback", handler.GoogleCallback(db)).Methods("GET")
+	router.HandleFunc("/api/auth/refresh-token", handler.RefreshToken).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(port, router))
 }

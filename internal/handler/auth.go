@@ -49,6 +49,7 @@ func GoogleLogin(w http.ResponseWriter, r *http.Request) {
 //GoogleCallback func
 func GoogleCallback(db *sqlx.DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		user, err := getUserInfo(r.FormValue("state"), r.FormValue("code"))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
@@ -57,7 +58,7 @@ func GoogleCallback(db *sqlx.DB) http.Handler {
 
 		var userID string
 
-		//Checks if the user if the user is regisred else, if not the user is registered
+		//Checks if the user if the user is registered else, if not the user is registered
 		registeredUser, err := model.SelectUserByProviderID(db, user.ProviderID)
 		if err != nil || (model.User{}) == *registeredUser {
 			err := user.Insert(db)
@@ -65,21 +66,33 @@ func GoogleCallback(db *sqlx.DB) http.Handler {
 				http.Error(w, "Unable to Register User: \n"+err.Error(), http.StatusInternalServerError)
 				return
 			}
-
 			userID = user.UserID
 		} else {
 			userID = registeredUser.UserID
 		}
 
-		token, err := auth.GenerateToken(userID)
+		accessToken, err := auth.GenerateAccessToken(userID)
+		if err != nil {
+			http.Error(w, "Failed to Generate JWT: \n"+err.Error(), http.StatusInternalServerError)
+		}
+		refreshToken, err := auth.GenerateRefreshToken(userID)
 		if err != nil {
 			http.Error(w, "Failed to Generate JWT: \n"+err.Error(), http.StatusInternalServerError)
 		}
 
 		w.Header().Set("Content-Type", "application/json")
+
+		cookie := http.Cookie{
+			Name:     "refresh_token",
+			Value:    refreshToken,
+			HttpOnly: true,
+			Path:     "/",
+		}
+		http.SetCookie(w, &cookie)
+
 		json.NewEncoder(w).Encode(struct {
 			AccessToken string `json:"access_token"`
-		}{token})
+		}{accessToken})
 
 	})
 }

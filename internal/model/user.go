@@ -1,16 +1,23 @@
 package model
 
-import "github.com/jmoiron/sqlx"
+import (
+	"fmt"
+	"time"
+
+	"github.com/jmoiron/sqlx"
+)
 
 // User Struct
 type User struct {
-	UserID     string `json:"user_id"`
-	ProviderID string `json:"id"`
-	Email      string `json:"email"`
-	Name       string `json:"name"`
-	GivenName  string `json:"given_name"`
-	FamilyName string `json:"family_name"`
-	Picture    string `json:"picture"`
+	UserID     string    `json:"user_id" db:"user_id"`
+	Username   string    `json:"username" db:"username"`
+	ProviderID string    `json:"id" db:"provider_id"`
+	Email      string    `json:"email" db:"email"`
+	Picture    string    `json:"picture" db:"picture"`
+	Name       string    `json:"name" db:"name"`
+	GivenName  string    `json:"given_name" db:"given_name"`
+	FamilyName string    `json:"family_name" db:"family_name"`
+	Joined     time.Time `json:"joined" db:"joined"`
 }
 
 //Insert user
@@ -26,10 +33,14 @@ func (u *User) Insert(db *sqlx.DB) error {
 }
 
 //SelectUserByProviderID func
-func SelectUserByProviderID(db *sqlx.DB, ProviderID string) (*User, error) {
-	sqlStatement := "SELECT * FROM users WHERE provider_id = $1;"
+func SelectUserByProviderID(db *sqlx.DB, providerID string) (*User, error) {
+	sqlStatement := "SELECT user_id, provider_id, email, name, given_name, family_name, picture, joined FROM users WHERE provider_id  = $1;"
 
-	var user User
-	err := db.Get(&user, sqlStatement, ProviderID)
+	user := User{}
+	err := db.Get(&user, sqlStatement, providerID)
+
+	fmt.Printf("%#v\n", user)
+	fmt.Println(user.Joined.String())
+
 	return &user, err
 }

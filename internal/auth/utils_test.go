@@ -7,14 +7,14 @@ import (
 )
 
 func TestGenerateAndVerify(t *testing.T) {
-	tokenString, err := GenerateToken("1")
+	tokenString, err := GenerateAccessToken("1")
 	if err != nil {
 		t.Error(err)
 	}
 
 	t.Log(tokenString)
 
-	claims, err := verifyToken(tokenString)
+	claims, err := verifyAccessToken(tokenString)
 	if err != nil {
 		t.Error(err)
 	}

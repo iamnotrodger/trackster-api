@@ -18,7 +18,7 @@ func Middleware(next http.Handler) http.Handler {
 		}
 
 		tokenString = strings.Replace(tokenString, "Bearer ", "", 1)
-		claims, err := verifyToken(tokenString)
+		claims, err := verifyAccessToken(tokenString)
 		if err != nil {
 			http.Error(w, "Token Unauthorized", http.StatusUnauthorized)
 			return
