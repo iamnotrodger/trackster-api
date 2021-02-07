@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -38,9 +37,6 @@ func SelectUserByProviderID(db *sqlx.DB, providerID string) (*User, error) {
 
 	user := User{}
 	err := db.Get(&user, sqlStatement, providerID)
-
-	fmt.Printf("%#v\n", user)
-	fmt.Println(user.Joined.String())
 
 	return &user, err
 }
