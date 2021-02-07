@@ -9,7 +9,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/iamnotrodger/trackster-api/internal/auth"
 	"github.com/iamnotrodger/trackster-api/internal/model"
+	"github.com/jmoiron/sqlx"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -45,14 +47,41 @@ func GoogleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 //GoogleCallback func
-func GoogleCallback(w http.ResponseWriter, r *http.Request) {
-	user, err := getUserInfo(r.FormValue("state"), r.FormValue("code"))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
+func GoogleCallback(db *sqlx.DB) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, err := getUserInfo(r.FormValue("state"), r.FormValue("code"))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
 
-	fmt.Fprintf(w, "Content: %s\n", user)
+		var userID string
+
+		//Checks if the user if the user is regisred else, if not the user is registered
+		registeredUser, err := model.SelectUserByProviderID(db, user.ProviderID)
+		if err != nil || (model.User{}) == *registeredUser {
+			err := user.Insert(db)
+			if err != nil {
+				http.Error(w, "Unable to Register User: \n"+err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			userID = user.UserID
+		} else {
+			userID = registeredUser.UserID
+		}
+
+		token, err := auth.GenerateToken(userID)
+		if err != nil {
+			http.Error(w, "Failed to Generate JWT: \n"+err.Error(), http.StatusInternalServerError)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(struct {
+			AccessToken string `json:"access_token"`
+		}{token})
+
+	})
 }
 
 func getUserInfo(state string, code string) (*model.User, error) {

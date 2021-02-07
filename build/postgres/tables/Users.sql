@@ -6,6 +6,7 @@ CREATE TABLE users
     provider_id TEXT,
     email VARCHAR(254),
     picture TEXT,
+    name TEXT,
     given_name TEXT,
     family_name TEXT,
     joined TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

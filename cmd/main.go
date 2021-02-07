@@ -54,7 +54,7 @@ func main() {
 	//Login + Authentication
 	router.HandleFunc("/api/login", handler.Login).Methods("GET")
 	router.HandleFunc("/api/auth/google", handler.GoogleLogin).Methods("GET")
-	router.HandleFunc("/api/auth/google/callback", handler.GoogleCallback).Methods("GET")
+	router.Handle("/api/auth/google/callback", handler.GoogleCallback(db)).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(port, router))
 }
