@@ -57,7 +57,7 @@ func main() {
 	router.HandleFunc("/api/login", handler.Login).Methods("GET")
 	router.HandleFunc("/api/auth/google", handler.GoogleLogin).Methods("GET")
 	router.Handle("/api/auth/google/callback", handler.GoogleCallback(db)).Methods("GET")
-	router.HandleFunc("/api/auth/refresh-token", handler.RefreshToken).Methods("GET")
+	router.HandleFunc("/api/auth/refresh-token", handler.RefreshToken).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(port, router))
 }
