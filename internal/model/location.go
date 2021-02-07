@@ -1,8 +1,6 @@
 package model
 
 import (
-	"fmt"
-
 	"github.com/jmoiron/sqlx"
 )
 
@@ -29,8 +27,6 @@ func SelectLocationByAddress(db *sqlx.DB, address string) (Location, error) {
 
 	var location Location
 	err := db.Get(&location, sqlStatement, address)
-
-	fmt.Printf("%#v\n", location)
 
 	return location, err
 }

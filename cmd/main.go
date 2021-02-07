@@ -10,6 +10,7 @@ import (
 	"github.com/iamnotrodger/trackster-api/internal/auth"
 	"github.com/iamnotrodger/trackster-api/internal/handler"
 	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
 
 	_ "github.com/lib/pq"
 )
@@ -36,6 +37,11 @@ func getPort() string {
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading .env file")
+	}
+
 	port := getPort()
 
 	db, err := initDB()
