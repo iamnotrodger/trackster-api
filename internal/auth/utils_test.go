@@ -7,7 +7,7 @@ import (
 )
 
 func TestGenerateAndVerify(t *testing.T) {
-	tokenString, err := generateToken("1")
+	tokenString, err := GenerateToken("1")
 	if err != nil {
 		t.Error(err)
 	}
