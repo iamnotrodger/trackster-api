@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/iamnotrodger/trackster-api/internal/auth"
 	"github.com/iamnotrodger/trackster-api/internal/handler"
 	"github.com/jmoiron/sqlx"
 
@@ -41,14 +42,22 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer db.Close()
 
 	router := mux.NewRouter().StrictSlash(true)
 
-	//Routes
-	router.HandleFunc("/", handler.HomePage).Methods("GET")
+	//Middleware
+	router.Use(handler.LoggingMiddleware)
 
-	//Contact
-	router.Handle("/contact", handler.PostContact(db)).Methods("POST")
+	//Routes
+	router.HandleFunc("/", handler.Home).Methods("GET")
+
+	router.Handle("/api/contact", auth.Middleware(handler.PostContact(db))).Methods("POST")
+
+	router.HandleFunc("/api/login", handler.Login).Methods("GET")
+	router.HandleFunc("/api/auth/google", handler.GoogleLogin).Methods("GET")
+	router.Handle("/api/auth/google/callback", handler.GoogleCallback(db)).Methods("GET")
+	router.HandleFunc("/api/auth/refresh-token", handler.RefreshToken).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(port, router))
 }

@@ -42,8 +42,7 @@ func PostContact(db *sqlx.DB) http.Handler {
 		}
 
 		var contact model.Contact
-		//THIS IS JUST FOR TESTING FOR NOW
-		contact.UserID = "1"
+		contact.UserID = r.Header.Get("user_id")
 		contact.ContactTime = t
 		contact.LocationID = location.LocationID
 
