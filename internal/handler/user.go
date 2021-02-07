@@ -10,7 +10,6 @@ import (
 
 type UserPost struct {
 	Email       string `json:"email"`
-	PhoneNumber string `json:"phone_number"`
 }
 
 func PostUser(db *sqlx.DB) http.Handler {
@@ -20,10 +19,7 @@ func PostUser(db *sqlx.DB) http.Handler {
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		} else {
-			newUser := model.User{
-				Email: payload.Email,
-				PhoneNumber: payload.PhoneNumber,
-			}
+			newUser := model.User{Email: payload.Email}
 			err := newUser.Insert(db)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
