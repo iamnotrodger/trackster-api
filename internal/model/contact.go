@@ -29,3 +29,13 @@ func (c *Contact) Insert(db *sqlx.DB) error {
 
 	return nil
 }
+
+//SelectContactByTmeInterval func
+func SelectContactByTmeInterval(db *sqlx.DB, to string, from string) ([]Contact, error) {
+	sqlStatement := "SELECT * FROM contact WHERE contact_time <= $1 AND contact_time >= $2;"
+
+	contacts := []Contact{}
+	err := db.Select(&contacts, sqlStatement)
+
+	return contacts, err
+}
